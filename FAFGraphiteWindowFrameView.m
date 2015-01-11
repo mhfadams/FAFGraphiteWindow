@@ -105,8 +105,21 @@
 		resize = YES;
 	}
 	
+	BOOL move = NO;
+	if (
+		// in title bar
+		NSPointInRect(pointInView, NSMakeRect(0, originalFrame.size.height - 20, originalFrame.size.width, 20))
+		// in left edge
+		|| NSPointInRect(pointInView, NSMakeRect(0, 0, 6, originalFrame.size.height))
+		// in right edge
+		|| NSPointInRect(pointInView, NSMakeRect(originalFrame.size.width - 6, 20, 6, originalFrame.size.height - 20))
+		)
+	{
+		move = YES;
+	}
 	
-    while (YES)
+	
+    while (move || resize)
 	{
 		//
 		// Lock focus and take all the dragged and mouse up events until we
@@ -130,7 +143,7 @@
 		
 		NSRect newFrame = originalFrame;
 		
-		if (!resize)
+		if (move)
 		{
 			//
 			// Alter the frame for a drag
@@ -170,7 +183,7 @@
 			}
 			
 		}
-		else
+		else if (resize)
 		{
 			
 			
@@ -207,6 +220,8 @@
 				newFrame.origin.y -= minSize.height - newContentRect.size.height;
 			}
 		}
+		else
+			;
 		
 		[window setFrame:newFrame display:YES animate:NO];
 	}
@@ -461,6 +476,9 @@
 {
 	return YES;
 }
+
+- (BOOL) mouseDownCanMoveWindow
+{ return NO; }
 
 
 
