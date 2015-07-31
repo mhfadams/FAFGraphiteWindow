@@ -67,6 +67,8 @@
 			[self setFrame:newFrame];
 		}
 		
+		[self setToolTip:@"Close Window"];
+		
     }
     return self;
 }
@@ -84,7 +86,7 @@
 	if ( ! shouldUseImage )
 	{
 		// inner field
-		NSBezierPath* path = [NSBezierPath bezierPathWithRect:NSMakeRect(0.5, 0.5, 13.5, 13.5)];
+		NSBezierPath* path = [NSBezierPath bezierPathWithRect:NSMakeRect(1.5, 1.5, 11.5, 11.5)];
 		[[NSColor redColor] set];
 		[path stroke];
 		[path fill];
@@ -110,7 +112,7 @@
 			
 			//if (NO) //mouseIn)
 			//{
-			/* draw X in button */
+			/* draw X in button
 			[[NSColor blackColor] set];
 			path = [NSBezierPath bezierPath];
 			[path moveToPoint:NSMakePoint(3, 3)];
@@ -125,7 +127,7 @@
 			[path stroke];
 			[path moveToPoint:NSMakePoint(3.5, 10.5)];
 			[path lineToPoint:NSMakePoint(10.5, 3.5)];
-			[path stroke];
+			[path stroke]; */
 		}
 	}
 	

@@ -156,6 +156,13 @@
 
 }
 
+- (void) setDocumentEdited:(BOOL)flag
+{
+	[super setDocumentEdited:flag];
+	[[super contentView] setNeedsDisplay:YES];
+
+}
+
 //
 // setContentView:
 //
@@ -442,6 +449,17 @@
 }
 
 
+- (NSSize) maxSize
+{
+	NSSize size = [super maxSize];
+	// make sure window doesnt go taller than screen
+	NSRect screenBounds = [[NSScreen mainScreen] visibleFrame];
+	if (screenBounds.size.height < size.height)
+		size.height = screenBounds.size.height;
+	
+	return size;
+	
+}
 
 
 @end

@@ -79,6 +79,9 @@
 //	- click in the resize box should resize the window
 //	- click anywhere else will drag the window.
 //
+
+#define FAFUIKIT_TITLEBARCLICK_AGRESSIVE >=
+#define FAFUIKIT_TITLEBARCLICK_RESERVED ==
 - (void)mouseDown:(NSEvent *)event
 {
 	
@@ -87,7 +90,7 @@
 	NSPoint originalMouseLocation = [window convertBaseToScreen:[event locationInWindow]];
 	NSRect originalFrame = [window frame];
 	
-	if ([event clickCount] == 2)
+	if ([event clickCount] FAFUIKIT_TITLEBARCLICK_RESERVED 2)
 	{
 		if (NSPointInRect(pointInView, NSMakeRect(0, originalFrame.size.height - 20, originalFrame.size.width, 20))
 			||
@@ -439,7 +442,12 @@
 #pragma mark Draw Title Text
 	// title string draws in rect the width of title bar, and thus does its own centering.
 	// add surrounding spaces to ward off striping's intrusion
-	NSString *windowTitle = [NSString stringWithFormat:@"  %@  ", [[self window] title]];
+	NSString *windowTitle;
+	if ([self.window isDocumentEdited])
+		windowTitle = [NSString stringWithFormat:@" * %@  ", [[self window] title]];
+	else
+		windowTitle = [NSString stringWithFormat:@"  %@  ", [[self window] title]];
+
 	NSRect titleRect = NSMakeRect(stripXmin,
 								  selfBounds.size.height - 15.0,
 								  stripXmax,
