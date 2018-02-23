@@ -73,4 +73,6 @@
 - (void) performScrollUp: (id) sender;
 - (void) performScrollDown: (id) sender;
 
+- (void) checkFrame;
+
 @end

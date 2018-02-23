@@ -93,6 +93,8 @@
 		
 		isScrolled = NO;
 		
+		[self checkFrame];
+		
 		/*
 		unsigned int methodCount = 0;
 		Method *mlist = class_copyMethodList([NSWindow class], &methodCount);
@@ -117,6 +119,10 @@
 	[super dealloc];
 }
 
+- (void) awakeFromNib
+{
+	[self checkFrame];
+}
 
 - (BOOL)isScrolled
 {
@@ -171,6 +177,7 @@
 //
 - (void)setContentView:(NSView *)aView
 {
+
 	if ([childContentView isEqualTo:aView])
 	{
 		return;
@@ -216,7 +223,7 @@
 																					 bounds.size.height - 2.0 - windowButtonWidth, 
 																					 0,0)]; // button sets own size
 		[zoomButton setTarget:self];
-		[zoomButton setAction:@selector(performZoom:)];
+		[zoomButton setAction:@selector(zoom:)];
 		[frameView addSubview:zoomButton];
 		[zoomButton release];
 		
@@ -311,26 +318,23 @@
 	return YES;
 }
 
+
 - (void) performClose: (id)sender
 {
 	/* we have to re-implement performClose: because default implementation depends on
 	 presense (so it seems) of standard window close button
 	 */
+	BOOL shouldClose = YES;
 	if ([[self delegate] respondsToSelector:@selector(windowShouldClose:)])
-		[[self delegate] windowShouldClose:self];
-	
-	[self close];
+		shouldClose = [[self delegate] windowShouldClose:self];
+	if (shouldClose)
+	{
+		[self orderOut:self];
+		if ([self isReleasedWhenClosed])
+			[self performSelector:@selector(release) withObject:nil afterDelay:0];
+	}
 }
 
-
-/*!
-\brief	trap the zoom button's action, instead performing approved action.
- Instead of zooming we perform either scrollDown or scrollUp.
- */
-- (void) performZoom: (id)sender
-{
-	[super performZoom:sender];;
-}
 
 - (void) performShade: (id)sender
 {
@@ -383,9 +387,12 @@
 {
 	FAFGraphiteWindowFrameView *frameView = [super contentView];
 	NSRect bounds = [self frame];
-	bounds.origin = NSZeroPoint;
+	//bounds.origin = NSZeroPoint;
 	
-	// scroll ...
+	
+	// restore height, keep other measurements ...
+	bounds.origin.y = bounds.origin.y - restoreRect.size.height + 40;
+	restoreRect.origin = bounds.origin;
 	[self setFrame:restoreRect display:YES animate:NO];
 	isScrolled = NO;
 
@@ -400,7 +407,7 @@
 //
 // Returns the rect for the content rect, taking the frame.
 //
-+ (NSRect)contentRectForFrameRect:(NSRect)windowFrame styleMask:(unsigned int)windowStyle
++ (NSRect)contentRectForFrameRect:(NSRect)windowFrame styleMask:(NSUInteger)windowStyle
 {
 	// ignore style mask since we are always the same
 	
@@ -461,5 +468,21 @@
 	
 }
 
+- (void) checkFrame
+{
+	//printf("%s", __PRETTY_FUNCTION__);
+	NSRect oldFrame = [self frame];
+	NSRect newFrame = NSMakeRect(oldFrame.origin.x, oldFrame.origin.y, oldFrame.size.width, oldFrame.size.height);
+	NSRect visibleScreenRect = [[NSScreen mainScreen] visibleFrame];
+	CGFloat yMin = visibleScreenRect.origin.y;
+	CGFloat yMax = visibleScreenRect.size.height + yMin;
+	
+	if ( (newFrame.origin.y + newFrame.size.height) > yMax)
+		newFrame.origin.y = newFrame.origin.y - ((newFrame.origin.y + newFrame.size.height) - yMax);
+	
+	
+	[self setFrame:newFrame display:YES];
+	
+}
 
 @end
